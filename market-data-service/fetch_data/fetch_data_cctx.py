@@ -36,8 +36,26 @@ def fetch_l2_orderbook(exchange_id: str, symbol: str, depth: int = 10) -> dict:
         'datetime': orderbook.get('datetime'),
     }
 
+def fetch_ohlcv_data(exchange_id: str, symbol: str, timeframe: str = '1m', limit: int = 100) -> dict:
+    exchange = getattr(ccxt, exchange_id)({
+        'enableRateLimit': True,
+    })
+    exchange.load_markets()
+    ohlcv = exchange.fetch_ohlcv(symbol, timeframe, limit=limit)
+    return {
+        'exchange': exchange_id,
+        'symbol': symbol,
+        'timeframe': timeframe,
+        'ohlcv': [
+            {'timestamp': entry[0], 'open': entry[1], 'high': entry[2],
+             'low': entry[3], 'close': entry[4], 'volume': entry[5]}
+            for entry in ohlcv
+        ],
+    }
 
 if __name__ == "__main__":
-    symbol = 'BTC/USDT'
-    data = fetch_l1_bbo('binance', symbol)
-    print(f"time:{data['timestamp']} Best Bid: {data['bid_price']} | Best Ask: {data['ask_price']}")
+    data = fetch_ohlcv_data('binance', 'BTC/USDT', '1d', limit=100)
+    latest = data['ohlcv'][-1]
+    print(f"[{data['exchange']} {data['symbol']} {data['timeframe']}] "
+            f"Latest Candle: O={latest['open']} H={latest['high']} "
+            f"L={latest['low']} C={latest['close']} V={latest['volume']}")
