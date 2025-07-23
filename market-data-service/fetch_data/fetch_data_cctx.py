@@ -1,7 +1,7 @@
 from datetime import datetime, timezone
 import ccxt
 
-async def fetch_l1_bbo(exchange_id: str, symbol: str) -> dict:
+def fetch_l1_bbo(exchange_id: str, symbol: str) -> dict:
     exchange = getattr(ccxt, exchange_id)({
         'enableRateLimit': True,
     })
