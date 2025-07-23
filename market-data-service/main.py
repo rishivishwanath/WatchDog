@@ -1,16 +1,26 @@
 from fetch_data.fetch_data_cctx import fetch_l1_bbo
 import time
-ma={'binance':{'BTC/USDT'},'bybit':{'BTC/USDT'}}
+import asyncio
+import os
+import json
 
-def get_and_push():
+with open("market-data-service\exchanges.json") as f:
+    data=json.load(f)
+
+async def get_and_push():
+    with open("market-data-service\exchanges.json") as f:
+        data=json.load(f)
+    ma=data.get("ma")
     for i in ma:
         for j in ma[i]:
             print(i+" "+j)
-            data=fetch_l1_bbo(i,j)
+            data=await fetch_l1_bbo(i,j)
             print(data)
 
-if __name__=="__main__":
+async def main():
     while True:
-        get_and_push()
-        time.sleep(5)
-            
+        await get_and_push()
+        await asyncio.sleep(0.1)
+
+if __name__ == "__main__":
+    asyncio.run(main())
