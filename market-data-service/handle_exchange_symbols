@@ -1,0 +1,8 @@
+import ccxt
+
+exchange = ccxt.kucoin({
+    'enableRateLimit': True,
+})
+markets = exchange.load_markets()  # Fetch all trading pairs
+symbols = exchange.symbols         # List of symbols, e.g. ["BTC/USDT", "ETH/USDT", ...]
+print(symbols)

@@ -1,0 +1,7 @@
+[
+  {
+    "name": "BTC/USDT",
+    "partitions": 3,
+    "replication_factor": 1
+  }
+]

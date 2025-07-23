@@ -54,8 +54,5 @@ def fetch_ohlcv_data(exchange_id: str, symbol: str, timeframe: str = '1m', limit
     }
 
 if __name__ == "__main__":
-    data = fetch_ohlcv_data('binance', 'BTC/USDT', '1d', limit=100)
-    latest = data['ohlcv'][-1]
-    print(f"[{data['exchange']} {data['symbol']} {data['timeframe']}] "
-            f"Latest Candle: O={latest['open']} H={latest['high']} "
-            f"L={latest['low']} C={latest['close']} V={latest['volume']}")
+    data = fetch_l1_bbo('coinbase','BTC/USDT')
+    print(data)

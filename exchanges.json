@@ -1,0 +1,9 @@
+{
+    "listed": 
+    {
+    "binance": ["BTC/USDT", "ETH/USDT","XRP/USDT"],
+    "bybit":   ["BTC/USDT", "ETH/USDT","XRP/USDT"],
+    "coinbase":     ["BTC/USDT", "ETH/USDT","XRP/USDT"],
+    "kucoin": ["BTC/USDT", "ETH/USDT","XRP/USDT"]
+    }
+}
