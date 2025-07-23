@@ -1,0 +1,22 @@
+import redis
+import os
+from dotenv import load_dotenv
+load_dotenv()
+
+print(os.getenv('REDIS_PASSWORD'))
+
+r = redis.Redis(
+    host='redis-19355.crce179.ap-south-1-1.ec2.redns.redis-cloud.com',
+    port=19355,
+    decode_responses=True,
+    username="default",
+    password=os.getenv('REDIS_PASSWORD'),
+)
+
+success = r.set('foo', 'bar')
+# True
+
+result = r.get('foo')
+r.delete('foo')
+print(result)
+# >>> bar
