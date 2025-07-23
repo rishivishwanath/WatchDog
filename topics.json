@@ -1,6 +1,16 @@
 [
   {
-    "name": "BTC/USDT",
+    "name": "BTC_USDT",
+    "partitions": 3,
+    "replication_factor": 1
+  },
+  {
+    "name": "ETH_USDT",
+    "partitions": 3,
+    "replication_factor": 1
+  },
+  {
+    "name": "XRP_USDT",
     "partitions": 3,
     "replication_factor": 1
   }

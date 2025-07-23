@@ -3,7 +3,7 @@ import json
 
 # Connect to the broker running in Docker (use 'localhost:9092' from the host machine)
 consumer = KafkaConsumer(
-    'tasks',                        # Topic name
+    'SOL_USDT',                        # Topic name
     bootstrap_servers=['localhost:9092'], # From host machine
     group_id='fetch-data-group',          # Consumer group for parallelism and checkpointing
     auto_offset_reset='earliest',         # Start from earliest if no committed offset
