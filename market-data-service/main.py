@@ -3,6 +3,7 @@ import json
 from aiokafka import AIOKafkaConsumer
 from fetch_data.fetch_data_cctx import fetch_l1_bbo
 from message_queue.put_l1_data import send_data
+from fetch_data.exchange_manager_cctx import close_all_exchanges
 
 async def process_message(message):
     """Process each Kafka message asynchronously."""
@@ -26,6 +27,7 @@ async def consume_messages():
             # Schedule message processing concurrently
             asyncio.create_task(process_message(message))
     finally:
+        await close_all_exchanges()
         await consumer.stop()
 
 if __name__ == "__main__":

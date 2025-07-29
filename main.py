@@ -27,7 +27,7 @@ def main():
         i=0
     while True:
         get_and_push(data,i)
-        time.sleep(2)
+        time.sleep(50)
 
 if __name__ == "__main__":
     main()
