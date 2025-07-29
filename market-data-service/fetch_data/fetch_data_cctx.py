@@ -1,24 +1,29 @@
-from datetime import datetime, timezone
 import ccxt
+import asyncio
+import time
+from datetime import datetime, timezone
+import ccxt.async_support as ccxt  # Async version of ccxt
 
-def fetch_l1_bbo(exchange_id: str, symbol: str) -> dict:
-    exchange = getattr(ccxt, exchange_id)({
-        'enableRateLimit': True,
-    })
-    exchange.load_markets()
-    orderbook = exchange.fetch_order_book(symbol)  # REST polling
-    bid = orderbook['bids'][0] if orderbook['bids'] else [None, None]
-    ask = orderbook['asks'][0] if orderbook['asks'] else [None, None]
-    return {
-        'exchange': exchange_id,
-        'symbol': symbol,
-        'bid_price': bid[0],
-        'bid_size': bid[1],
-        'ask_price': ask[0],
-        'ask_size': ask[1],
-        'timestamp': datetime.now(timezone.utc),
-        'datetime': orderbook.get('datetime'),
-    }
+async def fetch_l1_bbo(exchange_id: str, symbol: str) -> dict:
+    exchange = getattr(ccxt, exchange_id)({'enableRateLimit': True})
+    await exchange.load_markets()
+    
+    try:
+        orderbook = await exchange.fetch_order_book(symbol)
+        bid = orderbook['bids'][0] if orderbook['bids'] else [None, None]
+        ask = orderbook['asks'][0] if orderbook['asks'] else [None, None]
+        return {
+            'exchange': exchange_id,
+            'symbol': symbol,
+            'bid_price': bid[0],
+            'bid_size': bid[1],
+            'ask_price': ask[0],
+            'ask_size': ask[1],
+            'timestamp': datetime.now(timezone.utc),
+            'datetime': orderbook.get('datetime'),
+        }
+    finally:
+        await exchange.close()
 
 def fetch_l2_orderbook(exchange_id: str, symbol: str, depth: int = 10) -> dict:
     exchange = getattr(ccxt, exchange_id)({
@@ -53,6 +58,22 @@ def fetch_ohlcv_data(exchange_id: str, symbol: str, timeframe: str = '1m', limit
         ],
     }
 
+async def main():
+    start_time = time.perf_counter()
+    
+    tasks = [
+        fetch_l1_bbo("binance", "BTC/USDT"),
+        fetch_l1_bbo("bybit", "BTC/USDT"),
+        fetch_l1_bbo("okx", "BTC/USDT"),
+    ]
+    
+    results = await asyncio.gather(*tasks)
+    
+    end_time = time.perf_counter()
+    print(f"\nExecution time: {end_time - start_time:.2f} seconds\n")
+    
+    for r in results:
+        print(r)
+
 if __name__ == "__main__":
-    data = fetch_l1_bbo('coinbase','BTC/USDT')
-    print(data)
+    asyncio.run(main())

@@ -1,21 +1,32 @@
-from kafka import KafkaConsumer
+import asyncio
 import json
+from aiokafka import AIOKafkaConsumer
 from fetch_data.fetch_data_cctx import fetch_l1_bbo
 from message_queue.put_l1_data import send_data
-# Connect to the broker running in Docker (use 'localhost:9092' from the host machine)
-consumer = KafkaConsumer(
-    'tasks',                        # Topic name
-    bootstrap_servers=['localhost:9092'], # From host machine
-    group_id='fetch-data-group',          # Consumer group for parallelism and checkpointing
-    auto_offset_reset='earliest',         # Start from earliest if no committed offset
-    enable_auto_commit=True,              # Kafka handles offset commits
-    value_deserializer=lambda m: json.loads(m.decode('utf-8'))  # Expecting JSON messages
-)
-def handle_tasks():
-    for message in consumer:
-        print(f"[{message.topic}] {message.value}")
-        data=fetch_l1_bbo(message.value['exchange'],message.value['symbol'])
-        send_data(data)
 
-if __name__=="__main__":
-    handle_tasks()
+async def process_message(message):
+    """Process each Kafka message asynchronously."""
+    print(f"[{message.topic}] {message.value}")
+    data = await fetch_l1_bbo(message.value['exchange'], message.value['symbol'])
+    send_data(data)
+
+async def consume_messages():
+    consumer = AIOKafkaConsumer(
+        'tasks',
+        bootstrap_servers='localhost:9092',
+        group_id='fetch-data-group',
+        auto_offset_reset='earliest',
+        enable_auto_commit=True,
+        value_deserializer=lambda m: json.loads(m.decode('utf-8'))
+    )
+
+    await consumer.start()
+    try:
+        async for message in consumer:
+            # Schedule message processing concurrently
+            asyncio.create_task(process_message(message))
+    finally:
+        await consumer.stop()
+
+if __name__ == "__main__":
+    asyncio.run(consume_messages())
