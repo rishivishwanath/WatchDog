@@ -6,7 +6,7 @@ producer = KafkaProducer(
     bootstrap_servers='localhost:9092',
     linger_ms=5,
     batch_size=32768,
-    compression_type='lz4',
+    # compression_type='lz4',
     value_serializer=lambda v: json.dumps(v, default=str).encode('utf-8'),
     key_serializer=lambda v: v.encode('utf-8')
 )
