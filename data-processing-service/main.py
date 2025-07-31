@@ -2,9 +2,11 @@ import asyncio
 import json
 from aiokafka import AIOKafkaConsumer
 from process_data.process_l1_data import process_l1_bbo
+from process_data.handle_redis import update_data
 
 async def process_data(message):
     # print(f"[{message.topic}] {message.value}")
+
     await process_l1_bbo(message.value['exchange'],
                           message.value['symbol'],
                           message.value['bid_price'],
@@ -12,6 +14,17 @@ async def process_data(message):
                           message.value['ask_price'],
                           message.value['ask_size'],
                           message.value['timestamp'])
+    cleandata = {
+        'bid_price': message.value['bid_price'],
+        'bid_size': message.value['bid_size'],
+        'ask_price': message.value['ask_price'],
+        'ask_size': message.value['ask_size']
+    }
+    await update_data(message.value['symbol'],
+                      message.value['exchange'],
+                        cleandata)
+
+
 
 async def consume_messages():
     consumer = AIOKafkaConsumer(
