@@ -11,8 +11,16 @@ producer = KafkaProducer(
     key_serializer=lambda v: v.encode('utf-8')
 )
 
-def send_data(data):
-    symbol_key = data['symbol']
-    future = producer.send("data", key=symbol_key, value=data)
+def send_data(ask_exchange,bid_exchange,symbol,bid_price,ask_price,plausible_size,timestamp):
+    data= {
+        "ask_exchange": ask_exchange,
+        "bid_exchange": bid_exchange,
+        "symbol": symbol,
+        "bid_price": bid_price,
+        "ask_price": ask_price,
+        "plausible_size": plausible_size,
+        "timestamp": timestamp
+    }
+    future = producer.send("arbitrage", key=symbol, value=data)
     future.add_callback(lambda meta: print(f"✅ Delivered: {meta.topic}-{meta.partition}"))
     future.add_errback(lambda exc: print(f"❌ Delivery failed: {exc}"))
