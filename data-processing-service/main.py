@@ -1,9 +1,17 @@
 import asyncio
 import json
 from aiokafka import AIOKafkaConsumer
+from process_data.process_l1_data import process_l1_bbo
 
-async def process_message(message):
-    print(f"[{message.topic}] {message.value}")
+async def process_data(message):
+    # print(f"[{message.topic}] {message.value}")
+    await process_l1_bbo(message.value['exchange'],
+                          message.value['symbol'],
+                          message.value['bid_price'],
+                          message.value['bid_size'],
+                          message.value['ask_price'],
+                          message.value['ask_size'],
+                          message.value['timestamp'])
 
 async def consume_messages():
     consumer = AIOKafkaConsumer(
@@ -18,8 +26,7 @@ async def consume_messages():
     await consumer.start()
     try:
         async for message in consumer:
-            # Schedule message processing concurrently
-            asyncio.create_task(process_message(message))
+            asyncio.create_task(process_data(message))
     finally:
         await consumer.stop()
 

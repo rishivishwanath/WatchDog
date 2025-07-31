@@ -3,7 +3,7 @@ import json
 
 # Connect to the broker running in Docker (use 'localhost:9092' from the host machine)
 consumer = KafkaConsumer(
-    'data',                        # Topic name
+    'arbitrage',                        # Topic name
     bootstrap_servers=['localhost:9092'], # From host machine
     group_id='fetch-data-group',          # Consumer group for parallelism and checkpointing
     auto_offset_reset='earliest',         # Start from earliest if no committed offset
@@ -15,3 +15,4 @@ print("Listening for messages...")
 
 for message in consumer:
     print(f"[{message.topic}]{message.key} {message.value}")
+
