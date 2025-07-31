@@ -20,7 +20,8 @@ async def update_data(symbol, exchange=None, data=None):
         }
     else:
         print(f"⚠️ No data found for {symbol}")
-    asyncio.create_task(r.hset(symbol, exchange, json.dumps(data)))
+    result= await asyncio.create_task(r.hset(symbol, exchange, json.dumps(data)))
+    print(result)
     return [symbol,formatted]
 
 async def main():
